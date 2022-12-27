@@ -1,0 +1,2 @@
+# ignore exe builds for gcc compilation
+*.exe
