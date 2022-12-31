@@ -22,9 +22,10 @@ int main()
 {
     int c0, c1, c2, state, prevState;
     int lSq, rSq, lCurl, rCurl, lParan, rParan;
-    int singleQ, doubleQ;
+    int startQuote, stopQuote, startComment, stopComment;
 
-    lSq = rSq = lCurl = rCurl = lParan = rParan = singleQ = doubleQ = 0;
+    lSq = rSq = lCurl = rCurl = lParan = rParan = startQuote = stopQuote = 0;
+    startComment = stopComment = 0;
 
     prevState = OUT;
     c0 = '\0';
@@ -34,10 +35,6 @@ int main()
     {
         c2 = getchar();
         state = determineState(c0, c1, c2, prevState);
-        printf("%d", state);
-        prevState = state;
-        c0 = c1;
-        c1 = c2;
 
         if (state == OUT)
         {
@@ -53,13 +50,38 @@ int main()
                     break;
             }
         }
-        // TODO handle balanced quotes!!!
+        else if (state == ENTERQUOTES)
+        {
+            ++startQuote;
+        }
+        else if (state == EXITQUOTES)
+        {
+            ++stopQuote;
+        }
+        else if (prevState == ENTERCOMMENT && state == MULTILINECOMMENT)
+        {
+            ++startComment;
+        }
+        else if (state == EXITCOMMENT)
+        {
+            ++stopComment;
+        }
 
         if (c1 == '\n')
         {
             putchar('\n'); // this is only used for console compatibility
         }
+        
+        prevState = state;
+        c0 = c1;
+        c1 = c2;
     }
+
+    printf("Parantheses:   %d, %d\n", lParan, rParan);
+    printf("Square Braces: %d, %d\n", lSq, rSq);
+    printf("Curly Braces:  %d, %d\n", lCurl, rCurl);
+    printf("Quotes:        %d, %d\n", startQuote, stopQuote);
+    printf("Comments:      %d, %d\n", startComment, stopComment);
 
     return 0;
 }
