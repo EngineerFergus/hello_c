@@ -4,17 +4,19 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAXOP 100       /* max size of operand or operator */
-#define NUMBER '0'      /* signal that a number was found */
-#define NAME '1'        /* signal that a named operator was found */
-#define VAR '2'         /* signal that a single letter variable was found */
-#define MAXVAL 100      /* max depth of the val stack */
-#define BUFSIZE 100     /* max size of getch buffer */
-#define MAXVAR 26       /* max number of variables */
+#define MAXOP       100     /* max size of operand or operator */
+#define NUMBER      '0'     /* signal that a number was found */
+#define NAME        '1'     /* signal that a named operator was found */
+#define VAR         '2'     /* signal that a single letter variable was found */
+#define MAXVAL      100     /* max depth of the val stack */
+#define BUFSIZE     100     /* max size of getch buffer */
+#define MAXVAR      26      /* max number of variables */
+#define MAXLINE     1000    /* maximum line size */
 
 /* Exercises 4-3 to 4-10 */
 
 int     getop(char []);
+int     getopbyline(char []);
 void    push(double);
 double  pop(void);
 double  peek(void);
@@ -26,13 +28,14 @@ void    ungetch(int);
 void    setvar(int);
 double  getvar(int);
 void    ungets(char []);
+int     getline(char [], int);
 
 double  val[MAXVAL];    /* value stack */
 double  vars[MAXVAR];   /* variables storage */
 double  ans = 0.0;      /* stores last printed value */
 int     sp = 0;         /* next free stack position */
 int     bufp = 0;       /* next free position in buf */
-int    buf[BUFSIZE];   /* buffer for ungetch */
+int     buf[BUFSIZE];   /* buffer for ungetch */
 
 /* reverse Polish calculator */
 int main()
@@ -50,7 +53,7 @@ int main()
 
     variable = 'a';
 
-    while ((type = getop(s)) != EOF)
+    while ((type = getopbyline(s)) != EOF)
     {
         switch(type)
         {
@@ -60,7 +63,7 @@ int main()
             case NAME:
                 if(!mathfunc(s))
                 {
-                    printf("error: unknown function provided\n");
+                    printf("error: unknown function provided %s\n", s);
                 }
                 break;
             case VAR:
@@ -112,7 +115,7 @@ int main()
                 }
                 else
                 {
-                    printf("error: unknown command %s\n", s);
+                    printf("error in main: unknown command %s\n", s);
                 }
                 break;
         }
@@ -249,6 +252,75 @@ int getop(char s[])
 	return NUMBER;
 }
 
+/* get next operator or numeric operand using getline instead of getch/ungetch */
+int getopbyline(char s[])
+{
+    static int i, len;
+    static char line[MAXLINE];
+    int j;
+
+    // get new line if finished reading current one
+    if (i == len)
+    {
+        len = getline(line, MAXLINE);
+        if (len == 0)
+        {
+            return EOF;
+        }
+        i = 0;
+    }
+
+    j = 0;
+    while (isblank(line[i]))
+    {
+        i++;
+    }
+
+    // check if negative number
+    if (line[i] == '-' && isdigit(line[i + 1]))
+    {
+        s[j++] = line[i++]; // push negative sign into buffer
+    }
+
+    if (isalpha(line[i]))
+    {
+        while (isalpha(line[i]))
+        {
+            s[j++] = line[i++];
+        }
+
+        s[j] = '\0';
+        return (strlen(s) == 1) ? VAR : NAME;
+    }
+
+    if (!isdigit(line[i]) && line[i] != '.')
+    {
+        return line[i++];
+    }
+
+    if (isdigit(line[i]))
+    {
+        while (isdigit(line[i]))
+        {
+            s[j++] = line[i++];
+        }
+    }
+
+    if (line[i] == '.')
+    {
+        s[j] = line[i];
+        i++;
+        j++;
+        while (isdigit(line[i]))
+        {
+            s[j++] = line[i++];
+        }
+    }
+
+    s[j] = '\0';
+    return NUMBER;
+}
+
 /* get a possibly pushed back character */
 int getch(void)
 {
@@ -304,4 +376,25 @@ void ungets(char s[])
     {
         ungetch(s[i]);
     }
+}
+
+/* retrieves the next line of characters from the input and returns the length of the line */
+int getline(char s[], int lim)
+{
+    int c, i;
+
+    i = 0;
+    while (--lim > 0 && (c = getchar()) != EOF && c != '\n')
+    {
+        s[i++] = c;
+    }
+
+    if(c == '\n')
+    {
+        s[i++] = c;
+    }
+
+    s[i] = '\0';
+
+    return i;
 }
