@@ -45,6 +45,17 @@ int main()
                     printf("error: zero divisor\n");
                 }
                 break;
+            case '%':
+                op2 = pop();
+                if (op2 != 0.0)
+                {
+                    push((long) pop() % (long) op2);
+                }
+                else
+                {
+                    printf("error: zero divisor in mod\n");
+                }
+                break;
             case '\n':
                 printf("\t%.8g\n", pop());
                 break;
@@ -93,31 +104,30 @@ int getop(char s[])
 {
     int i, c;
 
-    while((s[0] = c = getch()) == ' ' || c == '\t')
-        ;
-    
-    s[1] = '\0';
+	while ((s[0] = c = getch()) == ' ' || c == '\t')
+		;
+	s[1] = '\0';
 
-    if (!isdigit(c) && c != '.')
-        return c; // not a number
-    
-    i = 0;
-    if (isdigit(c))  // collect integer part
-        while (isdigit(s[++i] = c = getch()))
-            ;
-    
-    if (c == '.')  // collection fractional part
-    {
-        while (isdigit(s[++i] = c = getch()))
-        {
-            ;
-        }
-    }
-    
-    s[i] = '\0';
-    if (c != EOF)
-        ungetch(c);
-    return NUMBER;
+	i = 0;
+	if (c == '-')                      /* check sign */
+		if (!isdigit(s[++i] = c = getch())) {
+			ungetch(c);                    
+			c = s[0];                  /* not a sign */
+		}
+
+	if (!isdigit(c) && c != '.')
+		return c;                      /* not a number */
+
+	if (isdigit(c))
+		while (isdigit(s[++i] = c = getch()))
+			;
+	if( c == '.')                      /* collect fraction part */
+		while (isdigit(s[++i] = c = getch()))
+			;
+	s[i] = '\0';
+	if (c != EOF)
+		ungetch(c);
+	return NUMBER;
 }
 
 #define BUFSIZE 100
