@@ -7,8 +7,10 @@
 #define MAXOP 100       /* max size of operand or operator */
 #define NUMBER '0'      /* signal that a number was found */
 #define NAME '1'        /* signal that a named operator was found */
+#define VAR '2'         /* signal that a single letter variable was found */
 #define MAXVAL 100      /* max depth of the val stack */
 #define BUFSIZE 100     /* max size of getch buffer */
+#define MAXVAR 26       /* max number of variables */
 
 /* Exercises 4-3 to 4-10 */
 
@@ -21,9 +23,13 @@ void    clear(void);
 int     mathfunc(char []);
 int     getch(void);
 void    ungetch(int);
+void    setvar(int);
+double  getvar(int);
+void    ungets(char []);
 
-double val[MAXVAL];     /* value stack */
-double ans = 0.0;       /* stores last printed value */
+double  val[MAXVAL];    /* value stack */
+double  vars[MAXVAR];       /* variables storage */
+double  ans = 0.0;      /* stores last printed value */
 int     sp = 0;         /* next free stack position */
 int     bufp = 0;       /* next free position in buf */
 char    buf[BUFSIZE];   /* buffer for ungetch */
@@ -31,9 +37,18 @@ char    buf[BUFSIZE];   /* buffer for ungetch */
 /* reverse Polish calculator */
 int main()
 {
-    int type;
+    int i;
+
+    for (i = 0; i < MAXVAR; i++)
+    {
+        vars[i] = 0.0;
+    }
+
+    int type, variable;
     double op2;
     char s[MAXOP];
+
+    variable = 'a';
 
     while ((type = getop(s)) != EOF)
     {
@@ -47,6 +62,9 @@ int main()
                 {
                     printf("error: unknown function provided\n");
                 }
+                break;
+            case VAR:
+                push(getvar(s[0]));
                 break;
             case '+':
                 push(pop() + pop());
@@ -84,8 +102,18 @@ int main()
                 ans = pop();
                 printf("\t%.8g\n", ans);
                 break;
+            case '=':
+                setvar(variable);
+                break;
             default:
-                printf("error: unknown command %s\n", s);
+                if (islower(type))
+                {
+                    variable = type; // remember last variable name
+                }
+                else
+                {
+                    printf("error: unknown command %s\n", s);
+                }
                 break;
         }
     }
@@ -138,6 +166,7 @@ void clear(void)
     sp = 0;
 }
 
+/* performs predefined math operations */
 int mathfunc(char name[])
 {
     if(!strcmp(name, "sin"))
@@ -202,7 +231,7 @@ int getop(char s[])
             ;
         s[i] = '\0';
         ungetch(c);
-        return strlen(s) == 1 ? s[0] : NAME;
+        return strlen(s) == 1 ? VAR : NAME;
     }        
 
 	if (!isdigit(c) && c != '.')
@@ -237,4 +266,36 @@ void ungetch(int c)
     {
         buf[bufp++] = c;
     }
+}
+
+/* sets variable slot var to top value of stack */
+void setvar(int var)
+{
+    if(var >= 'a' && var <= 'z')
+    {
+        vars[var - 'a'] = pop();
+    }
+    else
+    {
+        printf("error: tried setting unknown variable name\n");
+    }
+}
+
+double getvar(int var)
+{
+    if(var >= 'a' && var <= 'z')
+    {
+        return vars[var - 'a'];
+    }
+    else
+    {
+        printf("error: tried getting unknown variable name\n");
+        return 0.0;
+    }
+}
+
+/* pushes as entire string back onto the buffer */
+void ungets(char s[])
+{
+
 }
