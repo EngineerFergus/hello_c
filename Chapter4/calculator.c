@@ -28,11 +28,11 @@ double  getvar(int);
 void    ungets(char []);
 
 double  val[MAXVAL];    /* value stack */
-double  vars[MAXVAR];       /* variables storage */
+double  vars[MAXVAR];   /* variables storage */
 double  ans = 0.0;      /* stores last printed value */
 int     sp = 0;         /* next free stack position */
 int     bufp = 0;       /* next free position in buf */
-char    buf[BUFSIZE];   /* buffer for ungetch */
+int    buf[BUFSIZE];   /* buffer for ungetch */
 
 /* reverse Polish calculator */
 int main()
@@ -121,7 +121,7 @@ int main()
     return 0;
 }
 
-/* push: push f onto value stack */
+/* push f onto value stack */
 void push(double f)
 {
     if (sp < MAXVAL)
@@ -130,7 +130,7 @@ void push(double f)
         printf("error: stack full, can't push %g\n", f);
 }
 
-/* pop: pop and return top value from stack */
+/* pop and return top value from stack */
 double pop(void)
 {
     if (sp > 0)
@@ -209,7 +209,7 @@ int mathfunc(char name[])
     return 1;
 }
 
-/* getop: get next operator or numeric operand */
+/* get next operator or numeric operand */
 int getop(char s[])
 {
     int i, c;
@@ -249,13 +249,13 @@ int getop(char s[])
 	return NUMBER;
 }
 
-/* getch: get a possibly pushed back character */
+/* get a possibly pushed back character */
 int getch(void)
 {
     return (bufp > 0) ? buf[--bufp] : getchar();
 }
 
-/* ungetch: push character back on input */
+/* push character back on input */
 void ungetch(int c)
 {
     if (bufp >= BUFSIZE)
@@ -281,6 +281,7 @@ void setvar(int var)
     }
 }
 
+/* retrieves the variable value from stored values */
 double getvar(int var)
 {
     if(var >= 'a' && var <= 'z')
