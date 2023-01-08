@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>     /* for atof() */
+#include <math.h>
 
 #define MAXOP 100       /* max size of operand or operator */
 #define NUMBER '0'      /* signal that a number was found */
@@ -9,6 +10,9 @@
 int getop(char []);
 void push(double);
 double pop(void);
+double peek(void);
+void swap(void);
+void clear(void);
 
 /* reverse Polish calculator */
 int main()
@@ -92,6 +96,30 @@ double pop(void)
         printf("error: stack empty\n");
         return 0.0;
     }
+}
+
+/* retrieve the top value on the stack without removing */
+double peek(void)
+{
+    double top = pop();
+    push(top);
+    return top;
+}
+
+/* swap the top two elements on the stack */
+void swap(void)
+{
+    double top1, top2;
+    top1 = pop();
+    top2 = pop();
+    push(top1);
+    push(top2);
+}
+
+/* clear the stack */
+void clear(void)
+{
+    sp = 0;
 }
 
 #include <ctype.h>
