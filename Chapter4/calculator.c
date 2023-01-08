@@ -297,5 +297,10 @@ double getvar(int var)
 /* pushes as entire string back onto the buffer */
 void ungets(char s[])
 {
+    int i;
 
+    for (i = strlen(s) - 1; i >= 0; i--)
+    {
+        ungetch(s[i]);
+    }
 }
