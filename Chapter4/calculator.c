@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>     /* for atof() */
 #include <math.h>
+#include <string.h>
 
 #define MAXOP 100       /* max size of operand or operator */
 #define NUMBER '0'      /* signal that a number was found */
+#define NAME '1'        /* signal that a named operator was found */
 
 /* Exercises 4-3 to 4-10 */
 
@@ -13,6 +15,10 @@ double pop(void);
 double peek(void);
 void swap(void);
 void clear(void);
+int mathfunc(char []);
+
+double ans = 0.0; // last printed value
+
 
 /* reverse Polish calculator */
 int main()
@@ -27,6 +33,12 @@ int main()
         {
             case NUMBER:
                 push(atof(s));
+                break;
+            case NAME:
+                if(!mathfunc(s))
+                {
+                    printf("error: unknown function provided\n");
+                }
                 break;
             case '+':
                 push(pop() + pop());
@@ -61,7 +73,8 @@ int main()
                 }
                 break;
             case '\n':
-                printf("\t%.8g\n", pop());
+                ans = pop();
+                printf("\t%.8g\n", ans);
                 break;
             default:
                 printf("error: unknown command %s\n", s);
@@ -122,6 +135,48 @@ void clear(void)
     sp = 0;
 }
 
+int mathfunc(char name[])
+{
+    if(!strcmp(name, "sin"))
+    {
+        push(sin(pop()));
+    }
+    else if (!strcmp(name, "exp"))
+    {
+        push(exp(pop()));
+    }
+    else if (!strcmp(name, "pow"))
+    {
+        double op2 = pop();
+        push(pow(pop(), op2));
+    }
+    else if (!strcmp(name, "peek"))
+    {
+        printf("The top of the stack is %f\n", peek());
+    }
+    else if (!strcmp(name, "dup"))
+    {
+        double top = peek();
+        push(top);
+        printf("Duplicated %f on top of stack\n", top);
+    }
+    else if (!strcmp(name, "swap"))
+    {
+        swap();
+        printf("Swapped top two values of stack\n");
+    }
+    else if (!strcmp(name, "ans"))
+    {
+        push(ans);
+    }
+    else
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
 #include <ctype.h>
 
 int getch(void);
@@ -142,6 +197,15 @@ int getop(char s[])
 			ungetch(c);                    
 			c = s[0];                  /* not a sign */
 		}
+
+    if (isalpha(c))
+    {
+        while (isalpha(s[++i] = c = getch()))
+            ;
+        s[i] = '\0';
+        ungetch(c);
+        return strlen(s) == 1 ? s[0] : NAME;
+    }        
 
 	if (!isdigit(c) && c != '.')
 		return c;                      /* not a number */
