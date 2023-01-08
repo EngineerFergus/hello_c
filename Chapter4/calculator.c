@@ -12,21 +12,21 @@
 
 /* Exercises 4-3 to 4-10 */
 
-int getop(char []);
-void push(double);
-double pop(void);
-double peek(void);
-void swap(void);
-void clear(void);
-int mathfunc(char []);
-int getch(void);
-void ungetch(int);
+int     getop(char []);
+void    push(double);
+double  pop(void);
+double  peek(void);
+void    swap(void);
+void    clear(void);
+int     mathfunc(char []);
+int     getch(void);
+void    ungetch(int);
 
 double val[MAXVAL];     /* value stack */
 double ans = 0.0;       /* stores last printed value */
-int sp = 0;             /* next free stack position */
-int bufp = 0;           /* next free position in buf */
-char buf[BUFSIZE];      /* buffer for ungetch */
+int     sp = 0;         /* next free stack position */
+int     bufp = 0;       /* next free position in buf */
+char    buf[BUFSIZE];   /* buffer for ungetch */
 
 /* reverse Polish calculator */
 int main()
