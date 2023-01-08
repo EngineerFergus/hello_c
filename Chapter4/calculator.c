@@ -2,10 +2,13 @@
 #include <stdlib.h>     /* for atof() */
 #include <math.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAXOP 100       /* max size of operand or operator */
 #define NUMBER '0'      /* signal that a number was found */
 #define NAME '1'        /* signal that a named operator was found */
+#define MAXVAL 100      /* max depth of the val stack */
+#define BUFSIZE 100     /* max size of getch buffer */
 
 /* Exercises 4-3 to 4-10 */
 
@@ -16,9 +19,14 @@ double peek(void);
 void swap(void);
 void clear(void);
 int mathfunc(char []);
+int getch(void);
+void ungetch(int);
 
-double ans = 0.0; // last printed value
-
+double val[MAXVAL];     /* value stack */
+double ans = 0.0;       /* stores last printed value */
+int sp = 0;             /* next free stack position */
+int bufp = 0;           /* next free position in buf */
+char buf[BUFSIZE];      /* buffer for ungetch */
 
 /* reverse Polish calculator */
 int main()
@@ -84,11 +92,6 @@ int main()
 
     return 0;
 }
-
-#define MAXVAL 100      /* max depth of the val stack */
-
-int sp = 0;             /* next free stack position */
-double val[MAXVAL];     /* value stack */
 
 /* push: push f onto value stack */
 void push(double f)
@@ -177,11 +180,6 @@ int mathfunc(char name[])
     return 1;
 }
 
-#include <ctype.h>
-
-int getch(void);
-void ungetch(int);
-
 /* getop: get next operator or numeric operand */
 int getop(char s[])
 {
@@ -221,11 +219,6 @@ int getop(char s[])
 		ungetch(c);
 	return NUMBER;
 }
-
-#define BUFSIZE 100
-
-char buf[BUFSIZE];  /* buffer for ungetch */
-int bufp = 0;       /* next free position in buf */
 
 /* getch: get a possibly pushed back character */
 int getch(void)
