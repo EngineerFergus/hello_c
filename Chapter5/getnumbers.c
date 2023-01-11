@@ -3,17 +3,18 @@
 #include "getch.h"
 
 int getint(int *);
-int getfloat(int *);
+int getfloat(double *);
 
 int main()
 {
     int myInt, myChar;
+    double myFloat;
 
-    while((myChar = getint(&myInt)) != EOF)
+    while((myChar = getfloat(&myFloat)) != EOF)
     {
         if (myChar > 0)
         {
-            printf("found integer %d\n", myInt);
+            printf("found float %f\n", myFloat);
         }
     }
 
@@ -61,8 +62,57 @@ int getint(int *pn)
     return c;
 }
 
-int getfloat(float *pf)
+int getfloat(double *pf)
 {
-    // do the stuff
-    return EOF;
+    double val, power;
+
+    int c, sign;
+
+    while (isspace(c = getch()))
+        ; // skip white space
+    
+    if (!isdigit(c) && c != EOF && c != '+' && c != '-')
+    {
+        ungetch(c);
+        return 0; // it's not a number
+    }
+
+    sign = (c == '-') ? -1 : 1;
+
+    if (c == '+' || c == '-')
+    {
+        c = getch();
+
+        if (c == ' ')
+        {
+            return 0;
+        }
+    }
+
+    for (*pf = 0.0; isdigit(c); c = getch())
+    {
+        *pf = 10.0 * *pf + (c - '0');
+    }
+
+    // get the fractional portion
+
+    if (c == '.')
+    {
+        c = getch();
+    }
+
+    for (power = 1.0; isdigit(c); c = getch())
+    {
+        *pf = 10.0 * *pf + (c - '0');
+        power *= 10;
+    }
+
+    *pf = *pf * sign / power;
+
+    if (c != EOF)
+    {
+        ungetch(c);
+    }
+
+    return c;
 }
