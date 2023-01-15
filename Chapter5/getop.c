@@ -41,3 +41,42 @@ int getop(char s[])
 		ungetch(c);
 	return NUMBER;
 }
+
+int getopfrominput(char s[], char* pinput)
+{
+	int i, c;
+
+	while ((s[0] = c = *pinput) == ' ' || c == '\t')
+		pinput++;
+	s[1] = '\0';
+
+	i = 0;
+	if (c == '-')                      /* check sign */
+		if (!isdigit(s[++i] = c = *pinput)) {
+			pinput--;                    
+			c = s[0];                  /* not a sign */
+		}
+
+    if (isalpha(c))
+    {
+        while (isalpha(s[++i] = c = *pinput))
+            pinput++;
+        s[i] = '\0';
+        pinput--;
+        return c;
+    }        
+
+	if (!isdigit(c) && c != '.')
+		return c;                      /* not a number */
+
+	if (isdigit(c))
+		while (isdigit(s[++i] = c = *pinput))
+			pinput++;
+	if( c == '.')                      /* collect fraction part */
+		while (isdigit(s[++i] = c = *pinput))
+			pinput++;
+	s[i] = '\0';
+	if (c != EOF)
+		pinput--;
+	return NUMBER;
+}
