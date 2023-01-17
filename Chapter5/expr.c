@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "getch.h"
 #include "stack.h"
 #include "getop.h"
 #define MAXOP 100
+
+int getopnew(char s[], char* pinput);
 
 int main(int argc, char *argv[])
 {
@@ -12,10 +15,9 @@ int main(int argc, char *argv[])
     char s[MAXOP];
     int i = 1;
 
-    while (--argc > 0 && (type = getopfrominput(s, argv[i])) != EOF)
+    while (--argc > 0 && (type = getopnew(s, argv[i])) != EOF)
     {
         i++;
-        printf("%s\n", s);
         switch (type)
         {
             case NUMBER:
@@ -53,4 +55,48 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+int getopnew(char s[], char* pinput)
+{
+    int i, c;
 
+    s[0] = '\0';
+    s[1] = '\0';
+
+    while (*pinput == ' ' || *pinput == '\t')
+    {
+        pinput++; // skip white space
+    }
+
+    if (!isdigit(*pinput) && *pinput != '.')
+    {
+        s[0] = *pinput;
+        return *pinput;
+    }
+
+    i = 0;
+    if (isdigit(*pinput))
+    {
+        while(isdigit(*pinput))
+        {
+            s[i] = *pinput;
+            i++;
+            pinput++;
+        }
+    }
+
+    if (*pinput == '.')
+    {
+        s[i] = *pinput;
+        i++;
+        pinput++;
+        while (isdigit(*pinput))
+        {
+            s[i] = *pinput;
+            i++;
+            pinput++;
+        }
+    }
+
+    s[i] = '\0';
+    return NUMBER;
+}

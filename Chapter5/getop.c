@@ -57,14 +57,14 @@ int getopfrominput(char s[], char* pinput)
 			c = s[0];                  /* not a sign */
 		}
 
-    if (isalpha(c))
-    {
-        while (isalpha(s[++i] = c = *pinput))
-            pinput++;
-        s[i] = '\0';
-        pinput--;
-        return c;
-    }        
+    // if (isalpha(c))
+    // {
+    //     while (isalpha(s[++i] = c = *pinput))
+    //         pinput++;
+    //     s[i] = '\0';
+    //     pinput--;
+    //     return c;
+    // }        
 
 	if (!isdigit(c) && c != '.')
 		return c;                      /* not a number */
@@ -76,7 +76,7 @@ int getopfrominput(char s[], char* pinput)
 		while (isdigit(s[++i] = c = *pinput))
 			pinput++;
 	s[i] = '\0';
-	if (c != EOF)
-		pinput--;
+	// if (c != EOF)
+	// 	pinput--;
 	return NUMBER;
 }
