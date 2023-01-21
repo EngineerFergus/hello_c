@@ -1,0 +1,5 @@
+for exercises 6-2 to 6-4
+    - getinput.c/getinput.h for input (getch, getline, getword)
+    - wordnode.c/wordnode.h for containing binary tree of word counts
+    - somehow "unpack" binary tree into an array for final processing
+    - decide if actually going to attempt input/output of files
