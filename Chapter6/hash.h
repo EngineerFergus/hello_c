@@ -17,3 +17,6 @@ struct nlist *lookup(char *s);
 
 /* put (name, defn) in hashtab */
 struct nlist *install(char *name, char *defn);
+
+/* undef: remove (name, def) in hash table. Takes name as argument */
+void undef(char *s);

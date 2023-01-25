@@ -63,3 +63,17 @@ struct nlist *install(char *name, char *defn)
 
     return np;
 }
+
+/* undef: remove (name, def) in hash table. Takes name as argument */
+void undef(char *s)
+{
+	struct nlist *np;
+
+	if ((np = lookup(s)) != NULL) 
+    {
+		free((void *) np->name);       /* free name memory */
+		free((void *) np->defn);       /* free definition memory */
+		hashtab[hash(s)] = np->next;   /* clear index or relink next node */
+		free((void *) np);             /* free node memory */
+	}
+}
